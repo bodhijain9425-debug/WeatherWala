@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-midnight text-ink font-sans antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-monsoon ring-offset-2 ring-offset-midnight;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-panel/70 backdrop-blur-glass border border-panel-border shadow-glass rounded-xl2;
+  }
+
+  .data-readout {
+    @apply font-mono tabular-nums tracking-tight;
+  }
+}
+
+/* ---- MapLibre dark-theme overrides ---- */
+.maplibregl-ctrl-attrib {
+  background: transparent !important;
+  color: #8c96ac !important;
+  font-size: 10px !important;
+}
+.maplibregl-ctrl-attrib a {
+  color: #8c96ac !important;
+}
+.maplibregl-ctrl-bottom-right {
+  right: 0.5rem !important;
+  bottom: 0.5rem !important;
+}
+.maplibregl-ctrl-group {
+  background: rgba(20, 26, 43, 0.7) !important;
+  backdrop-filter: blur(16px);
+  border: 1px solid #2a3349 !important;
+  box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.45) !important;
+  border-radius: 0.75rem !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-group button {
+  background: transparent !important;
+}
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid #2a3349 !important;
+}
+.maplibregl-ctrl-icon {
+  filter: invert(1) brightness(1.7);
+}
+
+/* ---- Slim, dark-themed range input (timeline scrubber) ---- */
+.timeline-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  background: #2a3349;
+  border-radius: 999px;
+  outline: none;
+}
+.timeline-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #4fd1c5;
+  border: 2px solid #0a0f1c;
+  box-shadow: 0 0 0 1px #2a3349;
+  cursor: pointer;
+  margin-top: -6px;
+  transition: transform 120ms ease;
+}
+.timeline-range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+.timeline-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #4fd1c5;
+  border: 2px solid #0a0f1c;
+  box-shadow: 0 0 0 1px #2a3349;
+  cursor: pointer;
+}
+
+/* ---- Scrollbars ---- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a3349;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
