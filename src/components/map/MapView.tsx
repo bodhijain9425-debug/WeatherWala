@@ -20,7 +20,7 @@ export function MapView() {
   const layerDef = WEATHER_LAYERS.find((l) => l.id === activeLayer)!;
   const valueKey = `t${timelineIndex}`;
 
-  const { data: geojson, loading } = useWeatherLayer(activeLayer);
+  const { data, loading, error } = useWeatherLayer(activeLayer);
 
   const paint = useMemo<Record<string, unknown>>(() => {
     const [min, max] = layerRange(activeLayer);
@@ -29,7 +29,7 @@ export function MapView() {
       return {
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, 4, 8, 14],
         'circle-color': buildCircleColorExpression(activeLayer, ['get', valueKey]),
-        'circle-opacity': loading ? 0 : 0.85,
+        'circle-opacity': 0.85,
         'circle-stroke-width': 1,
         'circle-stroke-color': 'rgba(255,255,255,0.25)',
         'circle-opacity-transition': { duration: 300 },
@@ -41,10 +41,10 @@ export function MapView() {
       'heatmap-intensity': 1,
       'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 3, 24, 8, 50],
       'heatmap-color': buildHeatmapColorExpression(activeLayer),
-      'heatmap-opacity': loading ? 0 : 0.75,
+      'heatmap-opacity': 0.75,
       'heatmap-opacity-transition': { duration: 300 },
     };
-  }, [activeLayer, layerDef.renderAs, valueKey, loading]);
+  }, [activeLayer, layerDef.renderAs, valueKey]);
 
   return (
     <div className="relative h-full w-full">
@@ -60,8 +60,12 @@ export function MapView() {
         <AttributionControl compact position="bottom-left" />
         <NavigationControl position="bottom-right" showCompass={false} />
 
-        {geojson && (
-          <Source id="weather-grid" type="geojson" data={geojson}>
+        {/* Re-keying on the layer id swaps the source when the layer changes;
+            changing the timeline only updates `paint`, so MapLibre patches the
+            style in place with no data reload. Source is only mounted once
+            its data has arrived, so we never feed MapLibre an empty grid. */}
+        {data && (
+          <Source key={activeLayer} id="weather-grid" type="geojson" data={data}>
             <Layer
               id={`weather-${activeLayer}`}
               {...({ type: layerDef.renderAs, paint } as LayerProps)}
@@ -70,12 +74,15 @@ export function MapView() {
         )}
       </Map>
 
+      {/* Subtle status indicator — never blocks the map, just informs */}
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-midnight/20 backdrop-blur-[2px]">
-          <div className="flex items-center gap-3 rounded-full bg-panel/80 px-4 py-2 border border-panel-border shadow-glass">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-monsoon border-t-transparent" />
-            <span className="text-sm font-medium text-ink">Loading {layerDef.label}...</span>
-          </div>
+        <div className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 rounded-full bg-panel/80 px-3 py-1.5 text-xs text-mist backdrop-blur-glass">
+          Loading {layerDef.label.toLowerCase()} data…
+        </div>
+      )}
+      {error && !loading && (
+        <div className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 rounded-full bg-panel/80 px-3 py-1.5 text-xs text-marigold backdrop-blur-glass">
+          Couldn&apos;t load {layerDef.label.toLowerCase()} data — retrying on next layer switch
         </div>
       )}
     </div>
